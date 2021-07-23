@@ -1,0 +1,13 @@
+fisher-test results for transcription factors.
+hypothesis test on whether target transcription factors are enriched (higher proportion)
+ between peak region groups (w/ snp and w/o snp) with respect to reference transcription factors (ZNF354B, TBX18, and MGA).
+
+Summary of results:
+1. the results are surprising. since target factors are expected to roughly similarly enriched on either direction,
+  e.g., more like those in TBX18, but ZNF354B and MGA are highly enriched for regions w/ snp.
+  
+we may explore this to further details, see meeting memo:
+"Jay, Shannon, and Tao", Jul 22, 2021
+
+2. fisher test also shows (figures not uploaded, since they are trival) that the ratio of unique target TF peak vs
+  number of total peaks within region w/ and w/o snp is not statistically different.

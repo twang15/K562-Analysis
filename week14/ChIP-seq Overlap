@@ -1,0 +1,41 @@
+## Overlapped Factor peaks with and without SNPs with all other ChIP-seq binding data
+
+################ Bash Script below
+#!/bin/bash
+
+# See `man sbatch` or https://slurm.schedmd.com/sbatch.html for descriptions
+# of sbatch options.
+#SBATCH --job-name=k562_intersect
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --partition=interactive
+#SBATCH --account=default
+#SBATCH --time=6:00:00
+
+RUN_PATH=$(pwd)
+#SAMPLE="HepG2"
+SAMPLE="K562"
+
+UNIQ_TF_DIR="/home/smwhite4/Downloaded_files/$SAMPLE/download_hg38_bed/TF"  #ENCODE_K562.IDR0.02.filt.narrowPeak_MTA3.fasta
+OUTPUT_DIR="/home/smwhite4/Downloaded_files/$SAMPLE/Tao_Data"
+
+MERGED_TFs_DIR=${OUTPUT_DIR}/TFs_intersect
+if [[ ! -d ${MERGED_TFs_DIR} ]];then
+    mkdir -p ${MERGED_TFs_DIR}
+fi
+
+for each in $(ls ${OUTPUT_DIR}/*.bed); do
+    bedtools sort -i $each > $each.tmp
+done
+
+for each in $(ls ${OUTPUT_DIR}/*.tmp); do
+echo $each
+TF_name=$(echo $each|echo $each| sed 's:.*/::'| sed 's/\[FLAG\]//')
+echo $TF_name
+bedtools intersect -a $each -b *.tmp -wao -filenames> ${MERGED_TFs_DIR}/${TF_name}.intersect.bed 
+done
+################
+
+## Output files located in
+/home/smwhite4/Downloaded_files/K562/Tao_Data/TFs_intersect

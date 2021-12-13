@@ -53,18 +53,18 @@ def seqreverse(sequence_input):
 	sequence_length = len(sequence_input)
 	sequence_reversed = ''
 	for i in range(0, sequence_length):
-		sequence_reversed += BASE_PAIRING[sequence_input[sequence_length - i - 1]]
+		sequence_reversed += BASE_PAIRING[sequence_input[sequence_length - i - 1].upper()]
 	return sequence_reversed
 
 # check if the given output or report filenames already exist in the current folder
 OUTPUT_exist = os.path.isfile('./'+OUTPUT)
 REPORT_exist = os.path.isfile('./'+REPORT)
 if OUTPUT_exist and REPORT_exist:
-	print 'OUTPUT and REPORT filenames exist. Please try again using different file names.\n'
+	print ('OUTPUT and REPORT filenames exist. Please try again using different file names.\n')
 elif OUTPUT_exist:
-	print 'OUTPUT filename exists. Please try again using different file names.\n'
+	print ('OUTPUT filename exists. Please try again using different file names.\n')
 elif REPORT_exist:
-	print 'REPORT filename exists. Please try again using different file names.\n'
+	print ('REPORT filename exists. Please try again using different file names.\n')
 else:
 	# proceeed when the given output or report filenames do not exist in the current folder
 
@@ -105,7 +105,7 @@ else:
 				FILE_GENOME = SeqIO.parse(GENOME_gz, 'fasta')
 
 			if INPUT.endswith('vcf'):
-				FILE_INPUT = open(INPUT, 'U')
+				FILE_INPUT = open(INPUT, 'r')
 			elif INPUT.endswith('vcf.gz'):
 				FILE_INPUT = gzip.open(INPUT, 'r')
 
@@ -166,7 +166,7 @@ else:
 								data_all_report_action[eachline] = 'skipped'
 								data_all_report_submit[eachline] = 'none'
 
-							elif ref != CHROM_SEQ_dict[chrom][pos: pos+len(ref)]:
+							elif ref != CHROM_SEQ_dict[chrom][pos: pos+len(ref)].upper():
 								data_all_report_comment[eachline] = 'unmatched REF allele to the reference genome'
 								data_all_report_action[eachline] = 'skipped'
 								data_all_report_submit[eachline] = 'none'

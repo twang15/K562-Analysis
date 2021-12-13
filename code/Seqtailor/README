@@ -1,0 +1,112 @@
+Reference: http://shiva.rockefeller.edu/SeqTailor/documentation.html
+Paper: 
+REFERENCE: P. Zhang, et al. SeqTailor: a user-friendly webserver for the extraction of DNA or protein sequences from next-generation sequencing data. NAR. 2019
+
+===== SeqTailor_DNA_VCF_independent.py
+
+===== DNA seqeucne extraction for genomic variants in VCF files, independently.
+
+usage: SeqTailor_DNA_VCF_independent.py [-h] [-g GENOME] [-c {0,1}]
+                                        [-s {BOTH,FORWARD,REVERSE}]
+                                        [-wd WINDOW_DOWN] [-wu WINDOW_UP]
+                                        [-q {BOTH,WT,MT}] [-i INPUT]
+                                        [-o OUTPUT] [-r REPORT]
+
+SeqTailor DNA seqeuence extraction for genomic variants (independent) in VCF format
+
+arguments:
+  -h, --help            show this help message and exit
+  -g GENOME, --genome GENOME
+                        genome sequence filename (FASTA / FASTA.GZ)
+  -c {0,1}, --coordinate {0,1}
+                        coordinate indexing
+  -s {BOTH,FORWARD,REVERSE}, --strand {BOTH,FORWARD,REVERSE}
+                        strand
+  -wd WINDOW_DOWN, --window_down WINDOW_DOWN
+                        window size downstream
+  -wu WINDOW_UP, --window_up WINDOW_UP
+                        window size upstream
+  -q {BOTH,WT,MT}, --seq_type {BOTH,WT,MT}
+                        output sequence type
+  -i INPUT, --input INPUT
+                        input filename (VCF)
+  -o OUTPUT, --output OUTPUT
+                        output filename. default: sufix (.DNA.fasta)
+  -r REPORT, --report REPORT
+                        report filename. default: sufix (.report.txt)
+
+
+example:
+python SeqTailor_DNA_VCF_independent.py -g genome.fa -c 1 -s BOTH -wd 25 -wu 25 -q BOTH -i mutations.vcf
+
+
+===== SeqTailor_DNA_VCF_neighborhood.py
+
+DNA seqeucne extraction for genomic variants in VCF files, considering the neighboring variants within the given window.
+
+usage: SeqTailor_DNA_VCF_neighborhood.py [-h] [-g GENOME] [-c {0,1}]
+                                         [-s {BOTH,FORWARD,REVERSE}]
+                                         [-wd WINDOW_DOWN] [-wu WINDOW_UP]
+                                         [-q {BOTH,WT,MT}] [-i INPUT]
+                                         [-o OUTPUT] [-r REPORT]
+
+SeqTailor DNA seqeuence extraction for genomic variants (neghbourhood) in VCF format
+
+arguments:
+  -h, --help            show this help message and exit
+  -g GENOME, --genome GENOME
+                        genome sequence filename (FASTA / FASTA.GZ)
+  -c {0,1}, --coordinate {0,1}
+                        coordinate indexing
+  -s {BOTH,FORWARD,REVERSE}, --strand {BOTH,FORWARD,REVERSE}
+                        strand
+  -wd WINDOW_DOWN, --window_down WINDOW_DOWN
+                        window size downstream
+  -wu WINDOW_UP, --window_up WINDOW_UP
+                        window size upstream
+  -q {BOTH,WT,MT}, --seq_type {BOTH,WT,MT}
+                        output sequence type
+  -i INPUT, --input INPUT
+                        input filename (VCF)
+  -o OUTPUT, --output OUTPUT
+                        output filename. default: sufix (.DNA.fasta)
+  -r REPORT, --report REPORT
+                        report filename. default: sufix (.report.txt)
+
+
+example:
+python SeqTailor_DNA_VCF_neighborhood.py -g genome.fa -c 1 -s BOTH -wd 25 -wu 25 -q BOTH -i mutations.vcf
+
+
+
+
+====== SeqTailor_DNA_BED.py ========
+
+DNA seqeucne extraction from genomic ranges in BED files.
+
+ SeqTailor_DNA_BED.py
+
+usage: SeqTailor_DNA_BED.py [-h] [-g GENOME] [-c {0,1}]
+                            [-s {BOTH,FORWARD,REVERSE}] [-i INPUT] [-o OUTPUT]
+                            [-r REPORT]
+
+SeqTailor DNA seqeuence extraction for genomic ranges in BED format
+
+arguments:
+  -h, --help            show this help message and exit
+  -g GENOME, --genome GENOME
+                        genome sequence filename (FASTA / FASTA.GZ)
+  -c {0,1}, --coordinate {0,1}
+                        coordinate indexing
+  -s {BOTH,FORWARD,REVERSE}, --strand {BOTH,FORWARD,REVERSE}
+                        strand
+  -i INPUT, --input INPUT
+                        input filename (BED)
+  -o OUTPUT, --output OUTPUT
+                        output filename. default: sufix (.DNA.fasta)
+  -r REPORT, --report REPORT
+                        report filename. default: sufix (.report.txt)
+
+
+example:
+python SeqTailor_DNA_BED.py -g genome.fa -c 1 -s BOTH -i ranges.bed

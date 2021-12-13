@@ -1,0 +1,1 @@
+python SeqTailor_DNA_VCF_neighborhood_multiplication.py -g /oak/stanford/scg/prj_ENCODE/ChIP/basepairmodel/basepairmodels/SeqTailor/hg19.fa -c 1 -s FORWARD -wd 1056 -wu 1057 -q BOTH -i /oak/stanford/scg/prj_ENCODE/ChIP/basepairmodel/basepairmodels/SeqTailor/neighbor/test-2.vcf -o ins_containing.DNA.fasta -r ins_neighbor_report.report.txt  --is_debug true --coordinate 1

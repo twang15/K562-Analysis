@@ -584,6 +584,11 @@ def main():
                         ref = field[3]
                         alt = field[4]
                         each_variant = chrom + '_' + str(pos) + '_' + ref + '_' + alt
+                        
+                        ## if centered is true, use the center of the current variant as
+                        # the center of the final output. This will only affect seq position
+                        # w/ len(alt) > 1, specifically,
+                        # 1. if centered and len(alt) is even, then the window_left = len(alt)/2
 
                         if each_variant in data_variant_final_dict:                        
                             # current line being processed in the current file

@@ -167,6 +167,11 @@ def main():
             data_variant_final_dict = dict()
             data_variant_dict = dict()
             variant_to_line_dict = dict()
+            
+            # all variants (including ref) in one line:
+            # key: integer, len(ref) (should always be 1) or len(alt) (can be any integer)
+            # value: list, list of variants w/ the same length
+            variants_in_one_line_dict = dict()
 
             # the first base pair of ref is the mid-point
             # the window size is fixed and the window is sliding forward.
@@ -586,9 +591,73 @@ def main():
                         each_variant = chrom + '_' + str(pos) + '_' + ref + '_' + alt
                         
                         ## if centered is true, use the center of the current variant as
-                        # the center of the final output. This will only affect seq position
-                        # w/ len(alt) > 1, specifically,
-                        # 1. if centered and len(alt) is even, then the window_left = len(alt)/2
+                        # the center of the final output.
+                        def enumerate_variants_in_one_line(current_variant):
+                            
+                            # extract basic information for current variant
+                            variant_field = current_variant.split('_')
+                            chrom = variant_field[0]
+                            variant_pos = variant_field[1]
+                            variant_ref = variant_field[2]
+                            variant_alt = variant_field[3]
+                            
+                            # always put ref as the first in list w/ element length equal to 1.
+                            variants_in_one_line_dict[1] = list()
+                            assert len(ref) == 1, "Ref must have only one base pair."
+                            variants_in_one_line_dict[1].append(ref)
+                            
+                            # alternative alleles
+                            alt_list = alt.split(',')
+                            
+                            # initialize variants_in_one_line_dict
+                            # use set to get unique length of allels
+                            for length in set([len(alt) for alt in alt_list]):
+                                variants_in_one_line_dict[len(alt)] = list()
+                            
+                            for alt in alt_list:
+                                variants_in_one_line_dict[len(alt)].append(alt)
+                        
+                        def calculate_sliding_window(variant_pos, variant_seq, window_size):
+                            ''' calculate window_pos_left, window_pos_right for given constraints:
+                            variant_pos: the beginning position of the variant sequence, 0-based
+                            variant_seq: the variant sequence
+                            window_size: size of the sliding window
+                            
+                            return: the left, right boundary, and the center position, 0-based
+                            '''
+                            seq_length = len(variant_seq)
+                            is_even_seq = (seq_length % 2 == 0)
+                            is_even_window_size = (window_size % 2 == 0)
+                            
+                            # w/ mathematical reduction, we can merge case 1 and 3
+                            # into one case, and merge case 2 and 4 into one case,
+                            # w/ center = pos + (length-1)/2 for both.
+                            # case 1
+                            if is_even_seq and is_even_window_size:
+                                center = pos + length/2 - 1
+                                window_pos_left = center - window_size/2 + 1 #pos - (window_size-length)/2
+                                window_pos_right = center + window_size/2 # pos + (window_size+length)/2 - 1
+                            
+                            # case 2
+                            elif is_even_seq and not is_even_window_size:
+                                center = pos + length/2 - 1
+                                window_pos_left = center - window_size/2
+                                window_pos_right = center + window_size/2
+                            
+                            # case 3
+                            elif not is_even_seq and is_even_window_size:
+                                center = pos + length/2
+                                window_pos_left = center - window_size/2 + 1
+                                window_pos_right = center + window_size/2
+                            
+                            # case 4
+                            elif not is_even_seq and not is_even_window_size:
+                                center = pos + length/2
+                                window_pos_left = center - window_size/2
+                                windwo_pos_right = center + window_size/2
+                            
+                            return center, window_pos_left, window_pos_right
+                            
 
                         if each_variant in data_variant_final_dict:                        
                             # current line being processed in the current file

@@ -1,0 +1,20 @@
+SeqTailor_DNA_VCF_neighborhood_multiplication_centered.py
+
+solution 1: read the input file into memory and build an internal representation, 
+so that it can be randomly accessed (inspect lines before or after the current line.
+Steps:
+1. enumerate all variants for the current line
+2. calculate window boundaries for each variant
+3. Fill the window
+4. calculate the sequence for all valid variant combinations
+5. report to files.
+
+
+solution 2: solution 1 is a complete rewriting of the program.
+solution 2 is more like a patch on the current code.
+It is based on a key observation: when considering the current line w/ variant length equal to 1,
+ all valid line must already
+have been brought into the queue while checking all the lines whose reference positions fall into
+the sliding window. This is because that any alternative alleles must have length >= 1, so all valid
+variant must have been brought into the window when considering reference position which assumes that
+all ref/allels have sequence length 1.

@@ -1,5 +1,5 @@
 '''
-A universal genome sequence enumeration tool. 
+A universal genome sequence tailor tool. 
 Capable of enumerating all variants combinations within a user-specified window.
 
 Written by Tao Wang, Department of Genetics, School of Medicine, Stanford University, CA, USA.
@@ -50,6 +50,9 @@ def argument_parser():
     parser.add_argument("-f", "--tsv_file", help="tsv format for each sub-sequence, default: suffix (.tsv)")
     parser.add_argument('--is_debug', default=False, type=lambda x: (str(x).lower() in ['true', '1', 'yes']),
             help="Debug (true) or production (false, default to production)")
+    parser.add_argument('--independent', default=True, type=lambda x: (str(x).lower() in ['true', '1', 'yes']),
+            help="Enumerate variant combinations (True, default to not enumerate all the combinations but to" 
+            "treat each line of input independently.)")
     parser.add_argument('--ref_as_variant', default=False, type=lambda x: (str(x).lower() in ['true', '1', 'yes']),
             help="Use reference sequence as one of the variants in enumeration (false, default to not use)")
     
@@ -133,7 +136,7 @@ def intialize_chrom_set_and_dataframe(FILE_INPUT):
                         data_all_report_comment[eachline] = 'normal'
                         data_all_report_action[eachline] = 'normal'
                         data_all_report_submit[eachline] = each_variant
-                        data_variant_final_dict[each_variant] = 1
+                        # data_variant_final_dict[each_variant] = 1
 
                 else:
                     data_all_report_comment[eachline] = 'duplicated'
@@ -1081,6 +1084,7 @@ def main():
     TSV_OUTPUT = args.tsv_file
     # this flag controls whether to consider reference as one variant.
     ref_as_variant = args.ref_as_variant
+    independent = args.independent
 
     # generate the filenames for output and report, when these are not provided by the user
     if not OUTPUT:
@@ -1207,12 +1211,22 @@ def main():
     
                 # from now on, upstream and downstream variants are calculated separately.
                 # enumerate all upstream variants
-                current_row_num = focus_row_num - 1
+                if independent:
+                    # fake the current row is the one row before the first row, so that enumerate_upstream_variants
+                    # will just complete the all upstream variants with ref sequence.
+                    current_row_num = -1
+                else:
+                    current_row_num = focus_row_num - 1
                 upstream_variants = enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, 
                                                                 upstream_variants, chrom_sequence, ref_as_variant)
 
                 # enumerate all downstream variants
-                current_row_num = focus_row_num + 1
+                if independent:
+                    # fake the current row is the last row, so that
+                    # enumerate_downstream_variants will just complete the all downstream variants with ref sequence. 
+                    current_row_num = input_df.shape[0]
+                else:
+                    current_row_num = focus_row_num + 1
                 downstream_variants = enumerate_downstream_variants(focus_position, focus_chrom, current_row_num, 
                                                                 downstream_variants, chrom_sequence, ref_as_variant)
                 

@@ -316,7 +316,7 @@ def increment_downstream_variant(downstream_variant, left_over, current_row_num,
 
     return downstream_variant
                 
-def cross_chrom_update_upstream_variants(upstream_variants, chrom_sequence, current_row_num):
+def cross_chrom_update_upstream_variants(upstream_variants, chrom_sequence, current_row_num, base=1):
     '''
     when the current chromesome is different than the focus chromesome,
     all incomplete upstream variants shall be completed with reference sequence.
@@ -325,6 +325,7 @@ def cross_chrom_update_upstream_variants(upstream_variants, chrom_sequence, curr
     upstream_variants: list of all multiplicative upstream variants
     chrome_sequence: the focus chromesome
     current_row_num: the current row number in input_df
+    base: 0-base (0) or 1-base (1)
 
     Return:
         updated: whether any upstream variants have been updated.
@@ -344,9 +345,6 @@ def cross_chrom_update_upstream_variants(upstream_variants, chrom_sequence, curr
             # right boundary of the new variant.
             current_right_bound = upstream_variant['sequence'][0]['start']
             increment_sequence = ''
-            # Assume the chromesome coordinate is always 1-based.
-            # if the chromesome coordinate is 0-based, base should be set to 0
-            base = 1
             if (current_right_bound - left_over) >= base: # the chromesome has sufficient nucleutides
                 increment_sequence = str(chrom_sequence[(current_right_bound - left_over):current_right_bound])
             else:
@@ -400,7 +398,7 @@ def cross_chrom_update_downstream_variants(downstream_variants, chrom_sequence, 
                 increment_sequence = str(chrom_sequence[current_left_bound+1: (current_left_bound + left_over + 1)])
             else:
                 # Any nucleutides: 'N'
-                any_nucleutides = 'N'*(current_left_bound + left_over - chrom_length)
+                any_nucleutides = 'N'*(current_left_bound + 1 + left_over - chrom_length)
                 increment_sequence = str(chrom_sequence[current_left_bound+1:]) + any_nucleutides 
             
             increment_variant = { 'is_ref': True, 'is_center': False, 'row_num': current_row_num,
@@ -420,7 +418,7 @@ def cross_chrom_update_downstream_variants(downstream_variants, chrom_sequence, 
     return updated, updated_downstream_variants
 
 def enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, upstream_variants, chrom_sequence,
-                                    ref_as_variant):
+                                    ref_as_variant, base=1):
     '''
     Description:
         enumerate all combinations of upstream variants.
@@ -432,6 +430,7 @@ def enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, up
         upstream_variants: the initialized upstream variants, only containing the center upstream variants
         chrom_sequence: the entire sequence of the focus chromesome
         ref_as_variant: whether the reference sequence is considered as one of the multiplicative variants.
+        base: 0-base (0) or 1-base (1)
 
     Return:
         upstream_variants: all the enumerated upstream variants
@@ -451,7 +450,8 @@ def enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, up
             # current upstream variant is from a different chromesome other than the focus
             # for all incomplete variants, complete their current sequence
             updated, updated_upstream_variants = cross_chrom_update_upstream_variants(upstream_variants, 
-                                                                             chrom_sequence, current_row_num)
+                                                                             chrom_sequence, current_row_num,
+                                                                             base)
             if updated:
                 upstream_variants = updated_upstream_variants
             
@@ -556,7 +556,7 @@ def enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, up
         # current_row_num is -1, the focus variant row is 0, time to
         # complete all upstream variants
         updated, updated_upstream_variants = cross_chrom_update_upstream_variants(upstream_variants, 
-                                                                        chrom_sequence, current_row_num+1)
+                                                                        chrom_sequence, current_row_num+1, base)
         if updated:
             upstream_variants = updated_upstream_variants
 
@@ -1218,7 +1218,8 @@ def main():
                 else:
                     current_row_num = focus_row_num - 1
                 upstream_variants = enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, 
-                                                                upstream_variants, chrom_sequence, ref_as_variant)
+                                                                upstream_variants, chrom_sequence, ref_as_variant,
+                                                                COORDINATE)
 
                 # enumerate all downstream variants
                 if independent:

@@ -37,7 +37,7 @@ def argument_parser():
 
     parser = argparse.ArgumentParser(description="SeqTailor DNA sequence extraction for genomic variants (neighbourhood) in VCF format")
     parser.add_argument("-g", "--genome", help="genome sequence filename (FASTA / FASTA.GZ)")
-    parser.add_argument("-c", "--coordinate", choices=['0', '1'], default='1', help="coordinate indexing")
+    parser.add_argument("-c", "--coordinate", choices=['0', '1'], default='0', help="coordinate indexing")
     parser.add_argument("-s", "--strand", choices=['BOTH', 'FORWARD', 'REVERSE'], default='BOTH', help="strand")
     parser.add_argument("-wd", "--window_down", type=int, default=25, help="window size downstream")
     parser.add_argument("-wu", "--window_up", type=int, default=25, help="window size upstream")
@@ -1219,7 +1219,7 @@ def main():
                     current_row_num = focus_row_num - 1
                 upstream_variants = enumerate_upstream_variants(focus_position, focus_chrom, current_row_num, 
                                                                 upstream_variants, chrom_sequence, ref_as_variant,
-                                                                COORDINATE)
+                                                                int(COORDINATE))
 
                 # enumerate all downstream variants
                 if independent:

@@ -1,0 +1,13 @@
+1	# chrome: the chromesome for the reference sequence and variant sequence
+2	# position: the position of the motif
+3	# id: the id of the position
+4	# ref: reference sequence
+5	# alt: the alternative variant sequence. Now we only consider motif "DELETION"
+6	# ref_seq: the 2114 reference sequence
+7	# variant_seq: the 2114 variant sequence with the motif in 'ref' being deleted
+8	# ref_seq_1000: the 1000-bp reference sequence at the center of 2114 ref_seq window
+9	# variant_seq_1000: the 1000-bp variant sequence at the center of 2114 variant_seq window
+10	# ref_count_total: the total read count (exponentiated) of the reference sequence
+11	# variant_count_total: the total read count (exponentiated) of the variant sequence
+12	# ref_count_profile: the per-base read counts for 1000 reference sequence at the center of 2114 'ref_seq'
+13	# variant_count_profile: the per-base read counts for 1000 variant sequence at the center of 2114 'variant_seq'

@@ -729,7 +729,7 @@ def enumerate_upstream_downstream_combinations(upstream_variants, downstream_var
     for upstream_variant in upstream_variants:
         for downstream_variant in downstream_variants:
             if upstream_variant['identifier'] == downstream_variant['identifier']:
-                print('a valid combination')
+                #print('a valid combination')
 
                 complete_variant = copy.deepcopy(upstream_variant)
                 complete_variant['upstream'] = False
@@ -1185,6 +1185,7 @@ def main():
         # neighboring variants are those which are within WINDOW_SIZE window. 
         # The center of each focus variant in the focus row is the center of the window.
         last_row_num = input_df.shape[0]
+        rows_processed = 0
         with tqdm(total=last_row_num) as pbar:
             for focus_row_num in range(0, last_row_num):
                 # Focus the variant (focus)
@@ -1242,7 +1243,10 @@ def main():
                                                 STRAND, focus_chrom, focus_ref, focus_ref_len, ref_sequence)
 
                 # progress report
-                pbar.update(1)
+                rows_processed += 1
+                if rows_processed % 100 == 0:
+                    pbar.update(100)
+
 
         FILE_OUTPUT.close()
         TSV_FILE_OUTPUT.close()

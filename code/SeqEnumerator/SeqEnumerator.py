@@ -28,7 +28,7 @@ variant_to_line_dict = dict()
 CHROM_SEQ_dict = dict()
 
 # alt is a list of lists [[alt sequence, sequence len], [alt sequence, sequence len]...]
-input_df = pd.DataFrame(columns=['chrom', 'position', 'ref', 'ref_len', 'alt_lst'])
+input_df = pd.DataFrame(columns=['chrom', 'position', 'ref', 'ref_len', 'alt_lst', 'vcf_row_num'])
 
 def argument_parser():
     '''
@@ -75,9 +75,11 @@ def intialize_chrom_set_and_dataframe(FILE_INPUT):
 
     line_num = 0
 
+    vcf_row_num = 0
     try:
         FILE_INPUT.seek(0)
         for eachline in FILE_INPUT:
+            vcf_row_num += 1
             if not eachline.startswith('#') and eachline.strip():
                 eachline = eachline.strip()
                 field = eachline.split()
@@ -126,11 +128,11 @@ def intialize_chrom_set_and_dataframe(FILE_INPUT):
                         data_all_report_action[eachline] = 'normal'
                         data_all_report_submit[eachline] = each_variant_new
                         
-                        input_df.loc[line_num] = [chrom, pos, ref, len(ref), alt_column] 
+                        input_df.loc[line_num] = [chrom, pos, ref, len(ref), alt_column, vcf_row_num ] 
                         line_num += 1
 
                     else:
-                        input_df.loc[line_num] = [chrom, pos, ref, len(ref), [[alt, len(alt)]]] 
+                        input_df.loc[line_num] = [chrom, pos, ref, len(ref), [[alt, len(alt)]], vcf_row_num] 
                         line_num += 1
                         
                         data_all_report_comment[eachline] = 'normal'
@@ -906,7 +908,7 @@ def write_complete_variants_to_file(FILE_OUTPUT, complete_variants, WINDOW_SIZE,
 
 def write_complete_variants_to_tsv(TSV_FILE_OUTPUT, complete_variants, 
                                     WINDOW_SIZE, WINDOW_PREDICTION, STRAND, 
-                                    focus_chrom, focus_ref, focus_ref_len, Window_reference):
+                                    focus_chrom, focus_vcf_row_num, focus_ref, focus_ref_len, Window_reference):
     '''
     Analysis: the tsv file is a better way to represent the information because it is easier to process with
               pandas, e.g., filtering according to specific conditions.
@@ -923,6 +925,7 @@ def write_complete_variants_to_tsv(TSV_FILE_OUTPUT, complete_variants,
     STRAND: FORWARD/REVERSE/BOTH strand. The sequence information in complete_variants is only for
             forward strand. To get reverse strand, apply reverse complement operations.
     focus_chrom: the chromesome of the current variants
+    focus_vcf_row_num: row num of the current variant in vcf file, used to identify corresponding PPM info.
     focus_ref: the focus reference sequence
     focus_ref_len: the length in bp for focus ref (the center)
     ref_sequence: the WINDOW_SIZE long reference sequence (placing the focus reference at the center)
@@ -935,6 +938,7 @@ def write_complete_variants_to_tsv(TSV_FILE_OUTPUT, complete_variants,
     
     Chrom_tsv = focus_chrom
     Ref_tsv = focus_ref
+    vcf_row_num_tsv = focus_vcf_row_num
 
     # the prediction window is [flank_left_bound, flank_right_bound), length: WINDOW_PREDICTION
     flank_size = (WINDOW_SIZE - WINDOW_PREDICTION) // 2
@@ -1008,7 +1012,8 @@ def write_complete_variants_to_tsv(TSV_FILE_OUTPUT, complete_variants,
                                 f'\t{Variant_type_tsv}\t{Window_reference}\t{Window_sequence_tsv}'
                                 f'\t{Window_reference_prediction}\t{Window_sequence_prediction_tsv}'
                                 f'\t{Upstream_neighbors_tsv}\t{Downstream_neighbors_tsv}'
-                                f'\t{Upstream_neighbors_prediction_tsv}\t{Downstream_neighbors_prediction_tsv}\n')
+                                f'\t{Upstream_neighbors_prediction_tsv}\t{Downstream_neighbors_prediction_tsv}'
+                                f'\t{vcf_row_num_tsv}\n')
 
 def get_ref_sequence_for_upstream(focus_position, focus_ref, chrom_sequence, WINDOW_SIZE):
     '''
@@ -1128,7 +1133,7 @@ def main():
         SeqTailor_TSV_HEADERS = "Row_num\tChrom\tPosition\tFocus_ref\tFocus_varaint\tVariant_type" + \
                 "\tWindow_reference\tWindow_sequence\tWindow_reference_prediction" + \
                 "\tWindow_sequence_prediction\tUpstream_neighors\tDownstream_neighbors" + \
-                "\tUpstream_neighors_prediction\tDownstream_neighbors_prediction\n"
+                "\tUpstream_neighors_prediction\tDownstream_neighbors_prediction\tvcf_row_num_tsv\n"
 
         try:
             ###
@@ -1195,6 +1200,7 @@ def main():
                 focus_ref = focus_variant['ref']
                 focus_ref_len = focus_variant['ref_len']
                 focus_alts_lst = focus_variant['alt_lst']
+                focus_vcf_row_num = focus_variant['vcf_row_num']
                 chrom_sequence = CHROM_SEQ_dict[focus_chrom]
     
                 # whether to use reference genome as one of the variants in the enumeration
@@ -1240,7 +1246,7 @@ def main():
 
                 # Write out the csv file
                 write_complete_variants_to_tsv(TSV_FILE_OUTPUT, complete_variants, WINDOW_SIZE, WINDOW_PREDICTION,
-                                                STRAND, focus_chrom, focus_ref, focus_ref_len, ref_sequence)
+                                                STRAND, focus_chrom, focus_vcf_row_num, focus_ref, focus_ref_len, ref_sequence)
 
                 # progress report
                 rows_processed += 1
